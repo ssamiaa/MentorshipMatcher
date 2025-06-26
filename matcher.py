@@ -15,3 +15,7 @@ def get_skills(user_id, skill_type):
     skills = [row[0] for row in c.fetchall()]
     conn.close()
     return skills
+
+def calculate_score(mentor_skills, mentee_goals):
+    shared = set(mentor_skills).intersection(set(mentee_goals))
+    return len(shared)  # 1 point per shared skill
