@@ -19,7 +19,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         skill TEXT NOT NULL,
-        type TEXT CHECK(type IN ('has', 'wants')) NOT NULL,
+        type TEXT CHECK(type IN ('teach', 'learn')) NOT NULL,
         FOREIGN KEY(user_id) REFERENCES users(id)
     );
     ''')
