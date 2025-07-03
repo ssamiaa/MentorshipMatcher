@@ -1,48 +1,58 @@
+# matcher.py
 import sqlite3
 
-def get_all_users():
-    conn = sqlite3.connect('mentorship.db')
-    c = conn.cursor()
-    c.execute("SELECT id, name FROM users")
-    users = c.fetchall()
-    conn.close()
-    return users
-def get_skills(user_id, skill_type):
-    conn = sqlite3.connect('mentorship.db')
-    c = conn.cursor()
-    c.execute("SELECT skill FROM skills WHERE user_id = ? AND type = ?", (user_id, skill_type))
-    skills = [row[0] for row in c.fetchall()]
-    conn.close()
-    return skills
-
-def calculate_score(mentor_skills, mentee_goals):
-    shared = set(mentor_skills).intersection(set(mentee_goals))
-    return len(shared)  # 1 point per shared skill
-
 def match_users_by_skills():
-    users = get_all_users()
     conn = sqlite3.connect('mentorship.db')
     c = conn.cursor()
 
-    for mentor_id, mentor_name in users:
-        mentor_skills = get_skills(mentor_id, 'has')
-        if not mentor_skills:
-            continue  # skip if this user can't teach anything
+    # Find all users with teach skills
+    c.execute("SELECT DISTINCT user_id FROM skills WHERE type = 'teach'")
+    mentors = [r[0] for r in c.fetchall()]
 
-        for mentee_id, mentee_name in users:
+    # Find all users with learn skills
+    c.execute("SELECT DISTINCT user_id FROM skills WHERE type = 'learn'")
+    mentees = [r[0] for r in c.fetchall()]
+
+    new_matches = 0
+
+    for mentor_id in mentors:
+        c.execute("SELECT skill FROM skills WHERE user_id = ? AND type = 'teach'", (mentor_id,))
+        mentor_skills = set(r[0] for r in c.fetchall())
+
+        for mentee_id in mentees:
             if mentor_id == mentee_id:
-                continue  # don't match with self
-
-            mentee_goals = get_skills(mentee_id, 'wants')
-            if not mentee_goals:
                 continue
 
-            score = calculate_score(mentor_skills, mentee_goals)
+            c.execute("SELECT skill FROM skills WHERE user_id = ? AND type = 'learn'", (mentee_id,))
+            mentee_skills = set(r[0] for r in c.fetchall())
+
+            common = mentor_skills & mentee_skills
+            score = len(common)
+
             if score > 0:
-                c.execute("SELECT 1 FROM matches WHERE mentor_id = ? AND mentee_id = ?", (mentor_id, mentee_id))
-                if c.fetchone() is None:
-                    c.execute("INSERT INTO matches (mentor_id, mentee_id, score) VALUES (?, ?, ?)", (mentor_id, mentee_id, score))
-                    print(f"Matched {mentor_name} → {mentee_name} (Score: {score})")
+                # Insert or update the match
+                c.execute('''
+                    INSERT INTO matches (mentor_id, mentee_id, score)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(mentor_id, mentee_id)
+                    DO UPDATE SET score=excluded.score
+                ''', (mentor_id, mentee_id, score))
+                new_matches += 1
 
     conn.commit()
     conn.close()
+    return new_matches
+def view_matches_for_user(user_id):
+    conn = sqlite3.connect('mentorship.db')
+    c = conn.cursor()
+    c.execute('''
+        SELECT u.name, m.score
+        FROM matches m
+        JOIN users u
+            ON (m.mentor_id = ? AND m.mentee_id = u.id)
+            OR (m.mentee_id = ? AND m.mentor_id = u.id)
+    ''', (user_id, user_id))
+    rows = c.fetchall()
+    conn.close()
+    return rows
+

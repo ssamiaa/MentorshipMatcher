@@ -1,93 +1,141 @@
-from database import init_db
 import sqlite3
+from database import init_db
+from matcher import match_users_by_skills, view_matches_for_user
 
-print("\nWelcome to the Mentorship Matching Platform!")
-print("This tool helps connect people who want to learn with those who can teach.")
-print("You can sign up and add skills you want to teach or learn.\n")
-
-def add_user():
-    name = input("Enter your name: ").strip()
-    email = input("Enter your email: ").strip()
-
+def signup():
+    name  = input("Name: ").strip()
+    email = input("Email: ").strip()
     if not name or not email:
         print("Name and email cannot be empty.")
-        return
+        return None
 
     conn = sqlite3.connect('mentorship.db')
-    c = conn.cursor()
+    c    = conn.cursor()
     try:
         c.execute("INSERT INTO users (name, email) VALUES (?, ?)", (name, email))
-        user_id = c.lastrowid
         conn.commit()
-        print(f"User added successfully! Your user ID is: {user_id}")
+        uid = c.lastrowid
+        print(f"✔ Signed up! Your user ID is {uid}")
+        return uid, email
     except sqlite3.IntegrityError:
-        print("A user with this email already exists.")
+        print("✖ That email is already registered.")
+        return None
     finally:
         conn.close()
 
-def add_skills(user_id, skill_type):
+def login():
+    email = input("Email: ").strip()
+    conn  = sqlite3.connect('mentorship.db')
+    c     = conn.cursor()
+    c.execute("SELECT id, name FROM users WHERE email = ?", (email,))
+    row = c.fetchone()
+    conn.close()
+
+    if row:
+        uid, name = row
+        print(f"✔ Welcome back, {name} (ID: {uid})")
+        return uid, email
+    else:
+        print("✖ No account found with that email.")
+        return None
+
+def add_skill_cli(current_id):
+    stype = input("Are you adding a skill to 'teach' or 'learn'? ").lower()
+    if stype not in ('teach','learn'):
+        print("Please type exactly 'teach' or 'learn'.")
+        return
+
+    skill = input(f"Enter the skill to {('teach' if stype=='teach' else 'learn')}: ").strip().lower()
+    if not skill:
+        print("Skill cannot be blank.")
+        return
+
     conn = sqlite3.connect('mentorship.db')
-    c = conn.cursor()
-    while True:
-        skill = input(f"Enter skill to {'teach' if skill_type == 'has' else 'learn'} (or 'done'): ").lower().strip()
-        if skill == 'done':
-            break
-        if not skill:
-            print("Skill cannot be empty.")
-            continue
-        c.execute("INSERT INTO skills (user_id, skill, type) VALUES (?, ?, ?)", (user_id, skill, skill_type))
+    c    = conn.cursor()
+    c.execute("INSERT INTO skills (user_id, skill, type) VALUES (?, ?, ?)",
+              (current_id, skill, stype))
     conn.commit()
     conn.close()
 
-def get_users():
+    print(f"✔ Skill '{skill}' saved as '{stype}'.")
+    created = match_users_by_skills()
+    if created:
+        print(f"✔ {created} match(es) generated.")
+
+def view_my_skills(current_id):
     conn = sqlite3.connect('mentorship.db')
-    c = conn.cursor()
-    c.execute("SELECT id, name, email FROM users")
-    users = c.fetchall()
-    for user in users:
-        print(f"ID: {user[0]} | Name: {user[1]} | Email: {user[2]}")
+    c    = conn.cursor()
+    c.execute("SELECT skill, type FROM skills WHERE user_id = ?", (current_id,))
+    rows = c.fetchall()
     conn.close()
 
-# Initialize DB and main menu
-if __name__ == "__main__":
-    init_db()
+    if not rows:
+        print("You haven’t added any skills yet.")
+    else:
+        print("\nYour Skills:")
+        for skill, stype in rows:
+            tag = "Teach" if stype=='teach' else "Learn"
+            print(f"  • {skill}  ({tag})")
 
+def view_my_matches(current_id):
+    conn = sqlite3.connect('mentorship.db')
+    c    = conn.cursor()
+    c.execute('''
+        SELECT u2.name, m.score
+        FROM matches m
+        JOIN users u2 ON 
+            (m.mentor_id = ? AND m.mentee_id = u2.id)
+         OR (m.mentee_id = ? AND m.mentor_id = u2.id)
+    ''', (current_id, current_id))
+    rows = c.fetchall()
+    conn.close()
+
+    if not rows:
+        print("No matches found yet. Try adding some skills!")
+    else:
+        print("\nYour Matches:")
+        for name, score in rows:
+            print(f"  • {name}  (Score: {score})")
+
+def main():
+    init_db()
+    print("Welcome to Mentorship Matching Platform!  Sign up or log in to continue.\n")
+
+    # --- signup/login loop ---
+    user = None
+    while not user:
+        choice = input("1) Sign up   2) Log in   3) Exit  > ").strip()
+        if choice == "1":
+            user = signup()
+        elif choice == "2":
+            user = login()
+        elif choice == "3":
+            print("Goodbye."); return
+        else:
+            print("Invalid choice.")
+
+    current_id, _ = user
+
+    # --- main menu ---
     while True:
         print("\nWhat would you like to do?")
-        print("1. Sign up (Add user)")
-        print("2. View all users")
-        print("3. Add skills")
-        print("4. Run matchmaker")
-        print("5. View matches")
-        print("6. Exit")
+        print("1) Add a skill")
+        print("2) View my skills")
+        print("3) View my matches")
+        print("4) Logout / Exit")
+        cmd = input("> ").strip()
 
-        choice = input("Choice: ").strip()
-        try:
-            if choice == "1":
-                add_user()
-            elif choice == "2":
-                get_users()
-            elif choice == "3":
-                user_id = int(input("Enter your user ID: "))
-                skill_type = input("Type ('has' to teach or 'wants' to learn): ").lower()
-                if skill_type not in ['has', 'wants']:
-                    print("Invalid skill type.")
-                else:
-                    add_skills(user_id, skill_type)
-            elif choice == "4":
-                from matcher import match_users_by_skills
-                match_users_by_skills()
-            elif choice == "5":
-                from matcher import view_matches
-                view_matches()
-            elif choice == "6":
-                print("Goodbye!")
-                break
-            else:
-                print("Invalid choice.")
-        except sqlite3.OperationalError as e:
-            print("Database error:", e)
-        except ValueError:
-            print("Please enter valid numbers where needed.")
-        except Exception as e:
-            print("Something went wrong:", e)
+        if cmd == "1":
+            add_skill_cli(current_id)
+        elif cmd == "2":
+            view_my_skills(current_id)
+        elif cmd == "3":
+            view_my_matches(current_id)
+        elif cmd in ("4", "exit", "logout"):
+            print("See you next time.")
+            break
+        else:
+            print("Invalid command.")
+
+if __name__ == "__main__":
+    main()
