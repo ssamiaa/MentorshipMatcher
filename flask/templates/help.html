@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Help & How It Works</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #4F46E5;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h3 {
+            color: #4F46E5;
+            margin-top: 2rem;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 0.8rem 0;
+        }
+
+        ul {
+            margin-top: 0.5rem;
+            padding-left: 1.2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        a {
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 2rem;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Help & How It Works</h1>
+
+        <h3>🧭 Getting Started</h3>
+        <p>This platform is built to connect mentors and learners. To begin:</p>
+        <ul>
+            <li><strong>Sign up</strong> with your name and email.</li>
+            <li>Once logged in, you’ll land on your <strong>Dashboard</strong>.</li>
+        </ul>
+
+        <h3>🧠 Adding Skills</h3>
+        <p>On the dashboard, you can add skills you want to learn or teach. These skills help us find matches for you.</p>
+
+        <h3>🎯 Matches</h3>
+        <p>Based on your skills, we’ll display potential mentors or mentees under the “Your Learning Matches” section.</p>
+
+        <h3>📚 Creating a Course</h3>
+        <p>If you’re a mentor, you can click “Create a Course” on your dashboard. You’ll fill out:</p>
+        <ul>
+            <li>Course title and description</li>
+            <li>Choose free or paid</li>
+            <li>Optionally allow skill exchange</li>
+            <li>Start date</li>
+        </ul>
+
+        <h3>💡 Skill Exchange Option</h3>
+        <p>Some instructors allow <strong>skill exchange</strong> instead of payment. This means:</p>
+        <ul>
+            <li>You can enroll in their course for free if you agree to teach them one of your skills in return.</li>
+            <li>When viewing a course, you’ll see if it’s <em>“Open to Skill Exchange”</em> right below the price.</li>
+            <li>This creates a fair, collaborative learning experience where both sides benefit.</li>
+        </ul>
+
+        <h3>🔍 Browsing & Enrolling</h3>
+        <p>Click on “Browse Courses” in the navigation bar to see all available courses. Click “Enroll” to register.</p>
+
+        <h3>💳 Enrollment & Payment</h3>
+        <p>Payment info is requested just for demo purposes. Based on your selected method:</p>
+        <ul>
+            <li><strong>Visa/MasterCard:</strong> Enter card number, expiry, and CVV.</li>
+            <li><strong>Google Pay/Paytm:</strong> Enter a UPI or phone number.</li>
+        </ul>
+
+        <h3>📂 Enrolled Courses</h3>
+        <p>After enrolling, you’ll see your courses listed in your dashboard under “Your Enrolled Courses.”</p>
+
+        <h3>🚪 Logging Out</h3>
+        <p>Use the logout link in the navbar when you're done.</p>
+
+        <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</body>
+</html>
