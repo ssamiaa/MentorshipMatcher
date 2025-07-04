@@ -1,136 +1,139 @@
-# Mentorship Matching CLI Application
 
-## Overview
+# 🎓 Learning Hub – Mentorship and Course Platform
 
-This is a **Command-Line Interface (CLI) application** for managing a mentorship matching platform.
-It allows users to register, declare skills they can teach or want to learn, and automatically find matching pairs based on skill compatibility.
-
-The application uses **SQLite** as a lightweight, file-based database and is implemented in **Python**.
+**Learning Hub** is a modern web platform built with **Python + Flask** that connects learners and mentors through skill-based teaching, course creation, and peer-to-peer exchanges. Whether you want to teach, learn, or do both, this platform offers a simple and interactive space to register, match, and enroll in courses.
 
 ---
 
-## Who Will Use It
+## 🌟 Features
 
-This tool is designed for:
+### 🔐 User Authentication
 
-* **Students** seeking peer mentorship in different subjects or technologies
-* **Volunteers and instructors** who want to offer skills training
-* **Community organizations, clubs, or educational programs** that need a simple way to match mentors and mentees
+* Simple **sign-up** and **login** system
+* Session-based login using Flask sessions
 
-Potential use cases include:
+### 🧑‍🏫 Skills & Matching
 
-* University coding clubs
-* Non-profits providing tutoring
-* Internal training programs for small teams
+* Users can add **skills they can teach** and **skills they want to learn**
+* Based on this, the platform shows **learning matches**
+* Users can engage in **mutual skill exchange** or choose to enroll in paid courses
 
-Because it is CLI-based and local, it’s best suited for small-to-medium groups who don’t need a web interface.
+### 📚 Course Management
 
----
+* Users who have added a “teach” skill can **create courses**
+* Courses can be **free** or **paid**
+* Instructors define title, description, price, start date, and if they accept skill exchanges
 
-## Features
+### 🛒 Course Enrollment
 
-* **User Registration and Login**
+* Students can **browse all available courses**
+* Can **enroll** using a **fake but realistic payment flow**:
 
-  * Sign up with a name and email address (email must be unique)
-  * Log in to an existing account
-* **Skill Management**
+  * Choose payment method (Visa, MasterCard, Google Pay, Paytm)
+  * Input dummy payment details depending on the selected method
+* Instructors **cannot enroll** in their own courses
+* Already enrolled users see a “You’re already enrolled” message
 
-  * Add skills you can *teach* or *learn*
-  * View your skills
-* **Matching**
+### 💬 Help Page
 
-  * Automatically generate matches based on:
+* Guides new users on how the platform works:
 
-    * You can teach a skill someone else wants to learn
-    * You want to learn a skill someone else can teach
-  * View your matched users, including the matching score (number of overlapping skills)
-* **Persistent Storage**
-
-  * All data is stored in `mentorship.db` SQLite file
-
----
-
-## How Matching Works
-
-* When you add a skill:
-
-  * The system searches for other users with complementary skills
-  * If a compatible pairing exists (e.g., you want to learn Python and someone else teaches it), it generates a match
-  * The match is stored with a *score*, indicating how many skill overlaps you have
-* Each unique user pair appears only once, regardless of who added the skill first
+  * How to add skills
+  * How course creation works
+  * How skill exchange can waive payment
+  * How to enroll and see your dashboard
 
 ---
 
-## How to Use
+## 📂 File Structure Overview
 
-1. Run the application:
+```bash
+├── flask/
+│   ├── templates/
+│   │   ├── base.html
+│   │   ├── home.html
+│   │   ├── login.html
+│   │   ├── signup.html
+│   │   ├── dashboard.html
+│   │   ├── create_course.html
+│   │   ├── browse_courses.html
+│   │   ├── enroll.html
+│   │   └── help.html
+│   ├── static/ (optional for CSS/images)
+│
+├── models.py
+├── matcher.py
+├── app.py
+└── mentorship.db (SQLite database)
+```
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend**: Python 3, Flask
+* **Database**: SQLite3
+* **Frontend**: HTML5, CSS3 (with inline styles), Jinja2 templates
+* **Other**: Bootstrap/Tailwind-ready layout, Sessions, Flash messages
+
+---
+
+## 🧪 How to Run Locally
+
+1. **Clone the repository**:
 
    ```bash
-   python3 main.py
+   git clone https://github.com/your-username/learning-hub.git
+   cd learning-hub
    ```
-2. Sign up or log in.
-3. Add skills you can teach or learn.
-4. View your skills or matches.
-5. Continue adding new skills to expand matching opportunities.
 
----
-
-## Possible Improvements and Extensions
-
-This project provides a solid starting point but can be extended further:
-
-* **Web Interface**
-
-  * Build a web frontend (e.g., Flask or Django) to replace CLI.
-* **Notifications**
-
-  * Email users when new matches are found.
-* **Skill Levels**
-
-  * Allow specifying proficiency (beginner, intermediate, expert).
-* **Match Acceptance**
-
-  * Let users accept or decline matches.
-* **Messaging**
-
-  * Implement a basic communication system between matched users.
-* **Admin Dashboard**
-
-  * Provide admin tools to view all users, skills, and matches.
-* **Analytics**
-
-  * Show statistics about popular skills and match activity.
-* **Authentication**
-
-  * Add password-based login instead of only email-based identification.
-* **Recurring Events**
-
-  * Allow scheduling mentorship sessions.
-
----
-
-## Technology Stack
-
-* Python 3
-* SQLite (via `sqlite3` module)
-
----
-
-## Getting Started
-
-1. Clone the repository:
+2. **Set up a virtual environment**:
 
    ```bash
-   git clone <repo-url>
+   python3 -m venv venv
+   source venv/bin/activate  # or venv\Scripts\activate on Windows
    ```
-2. Install Python 3 if not already installed.
-3. Run:
+
+3. **Install dependencies**:
 
    ```bash
-   python3 main.py
+   pip install Flask
    ```
-4. Follow on-screen prompts.
+
+4. **Run the app**:
+
+   ```bash
+   python app.py
+   ```
+
+5. Open your browser and go to `http://localhost:5000`
 
 ---
 
-If you’d like, I can help you format this for Markdown, or tailor it further for your specific context.
+## 🔮 Future Improvements
+
+* Add profile images and bio for mentors
+* Add chat or scheduling functionality
+* Enable filtering or search in course browsing
+* Admin panel for managing users and reports
+* Email notifications for new matches or enrollments
+
+---
+
+## 💡 Sample Use Case
+
+> A user named Samia signs up and adds “Python” as a teaching skill and “UI/UX” as a learning skill.
+> Another user, Arjun, teaches UI/UX and wants to learn Python.
+> They are matched on the dashboard.
+> Samia also creates a course called “Intro to Python” that Arjun can enroll in either by paying or exchanging a skill.
+
+---
+
+## 🧑‍💻 Developer
+
+**Samia Sajid**
+Built as a side project to explore real-world applications of Flask, web development, and interactive learning platforms.
+
+---
+
+Let me know if you'd like it styled with Markdown badges or deployment instructions (e.g., for Render or Replit).
