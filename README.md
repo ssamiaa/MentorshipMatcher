@@ -1,7 +1,6 @@
+# 🔄 SkillSwap – Peer Learning, Mentorship & Skill Exchange Platform
 
-# 🎓 Learning Hub – Mentorship and Course Platform
-
-**Learning Hub** is a modern web platform built with **Python + Flask** that connects learners and mentors through skill-based teaching, course creation, and peer-to-peer exchanges. Whether you want to teach, learn, or do both, this platform offers a simple and interactive space to register, match, and enroll in courses.
+**SkillSwap** is a modern web platform built with **Python + Flask** that connects learners and mentors through skill-based teaching, course creation, and peer-to-peer exchanges. Whether you want to teach, learn, or do both, this platform offers a simple and interactive space to register, match, and enroll in courses.
 
 ---
 
