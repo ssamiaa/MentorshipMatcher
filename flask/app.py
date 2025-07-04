@@ -45,6 +45,7 @@ def browse_courses():
     conn.close()
 
     return render_template('browse_courses.html', courses=all_courses, enrolled_ids=enrolled_ids)
+
 @app.route('/enroll/<int:course_id>', methods=['GET', 'POST'])
 def enroll(course_id):
     user = get_user_from_session()
@@ -53,7 +54,7 @@ def enroll(course_id):
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT * FROM courses WHERE id = ?", (course_id,))
+    c.execute("SELECT id, title, description, created_by FROM courses WHERE id = ?", (course_id,))
     course = c.fetchone()
 
     if not course:
@@ -61,8 +62,10 @@ def enroll(course_id):
         flash("Course not found.")
         return redirect(url_for('browse_courses'))
 
+    course_id_db, course_title, _, created_by = course
+
     # Prevent enrolling in your own course
-    if course[3] == user.id:
+    if created_by == user.id:
         conn.close()
         flash("You cannot enroll in your own course.")
         return redirect(url_for('browse_courses'))
@@ -83,7 +86,6 @@ def enroll(course_id):
         else:
             fake_payment_code = "UNKNOWN"
 
-        # Insert into course_enrollments
         try:
             c.execute('''
                 INSERT INTO course_enrollments (course_id, user_id, fake_payment_code)
@@ -98,7 +100,8 @@ def enroll(course_id):
         return redirect(url_for('dashboard'))
 
     conn.close()
-    return render_template('enroll.html', course=course)
+    return render_template('enroll.html', course_title=course_title)
+
 
 # Signup page
 @app.route('/signup', methods=['GET', 'POST'])
@@ -200,6 +203,10 @@ def create_course():
         return redirect(url_for('dashboard'))
 
     return render_template('create_course.html')
+
+@app.route('/help')
+def help_page():
+    return render_template('help.html')
 
 
 # Logout
