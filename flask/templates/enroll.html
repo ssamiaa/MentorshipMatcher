@@ -1,45 +1,140 @@
-<h2>Enroll in {{ course[1] }}</h2>
-<p>{{ course[2] }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enroll in Course</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-<form method="post">
-  <label>Name:</label><br>
-  <input type="text" name="name" required><br><br>
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-  <label>Billing Address:</label><br>
-  <input type="text" name="billing" required><br><br>
+        h2 {
+            color:#4F46E5;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
 
-  <label>Payment Method:</label><br>
-  <select name="payment_method" id="payment_method" onchange="updatePaymentFields()" required>
-    <option value="">-- Select --</option>
-    <option value="visa">Visa</option>
-    <option value="mastercard">Mastercard</option>
-    <option value="googlepay">Google Pay</option>
-    <option value="paytm">Paytm</option>
-  </select><br><br>
+        form label {
+            display: block;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
 
-  <div id="card_fields" style="display:none;">
-    <label>Card Number:</label><br>
-    <input type="text" name="card_number"><br><br>
+        input, select {
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
 
-    <label>Expiry Date:</label><br>
-    <input type="text" name="expiry" placeholder="MM/YY"><br><br>
+        button {
+            width: 100%;
+            margin-top: 1.5rem;
+            background-color: #4F46E5;
+            color: white;
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
 
-    <label>CVV:</label><br>
-    <input type="text" name="cvv"><br><br>
-  </div>
+        button:hover {
+            background-color: #5a33a7;
+        }
 
-  <div id="upi_fields" style="display:none;">
-    <label>UPI ID / Phone Number:</label><br>
-    <input type="text" name="upi"><br><br>
-  </div>
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: #4F46E5;
+            font-weight: 500;
+        }
 
-  <button type="submit">Confirm Enrollment</button>
-</form>
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Enroll in "{{ course_title }}"</h2>
+        <form method="POST">
+            <label>
+                Full Name:
+                <input type="text" name="full_name" required>
+            </label>
+            <label>
+                Billing Address:
+                <input type="text" name="billing_address" required>
+            </label>
+            <label>
+                Payment Option:
+                <select name="payment_method" id="payment_method" required onchange="togglePaymentFields()">
+                    <option value="">Select</option>
+                    <option value="visa">Visa</option>
+                    <option value="mastercard">MasterCard</option>
+                    <option value="googlepay">Google Pay</option>
+                    <option value="paytm">Paytm</option>
+                </select>
+            </label>
+            <div id="payment-fields"></div>
+            <button type="submit">Confirm Enrollment</button>
+        </form>
 
-<script>
-function updatePaymentFields() {
-  const method = document.getElementById('payment_method').value;
-  document.getElementById('card_fields').style.display = ['visa', 'mastercard'].includes(method) ? 'block' : 'none';
-  document.getElementById('upi_fields').style.display = ['googlepay', 'paytm'].includes(method) ? 'block' : 'none';
-}
-</script>
+        <a href="{{ url_for('browse_courses') }}" class="back-link">← Back to Courses</a>
+    </div>
+
+    <script>
+        function togglePaymentFields() {
+            const method = document.getElementById('payment_method').value;
+            const container = document.getElementById('payment-fields');
+            container.innerHTML = '';
+
+            if (method === 'visa' || method === 'mastercard') {
+                container.innerHTML = `
+                    <label>
+                        Card Number:
+                        <input type="text" name="card_number" required>
+                    </label>
+                    <label>
+                        Expiry Date:
+                        <input type="month" name="expiry" required>
+                    </label>
+                    <label>
+                        CVV:
+                        <input type="text" name="cvv" required>
+                    </label>
+                `;
+            } else if (method === 'googlepay' || method === 'paytm') {
+                container.innerHTML = `
+                    <label>
+                        UPI/Phone Number:
+                        <input type="text" name="upi_id" required>
+                    </label>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

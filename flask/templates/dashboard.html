@@ -1,73 +1,183 @@
-{% set has_teach_skill = false %}
-{% for skill, skill_type in skills %}
-    {% if skill_type == 'teach' %}
-        {% set has_teach_skill = true %}
-    {% endif %}
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', sans-serif;
+            color: #333;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h2, h3 {
+            color: #4F46E5;
+            margin-bottom: 0.75rem;
+        }
+
+        form input[type="text"],
+        form select,
+        form button {
+            display: block;
+            width: 100%;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.6rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+        }
+
+        form button {
+            background-color: #4F46E5;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #4338CA;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            background-color: #f0f4ff;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        a.button-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #4F46E5;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        a.button-link:hover {
+            background-color: #3730A3;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+            margin: 1rem 0;
+        }
+
+        .highlight {
+            color: #1D4ED8;
+            font-weight: 500;
+        }
+
+        .no-data {
+            color: #888;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
 {% include 'navbar.html' %}
 
-<h2>Welcome, {{ name }}!</h2>
+<div class="container">
 
-<h3>Add a Skill</h3>
-<form method="post">
-    Skill: <input type="text" name="skill" required>
-    <select name="skill_type">
-        <option value="teach">Teach</option>
-        <option value="learn">Learn</option>
-    </select>
-    <button type="submit">Add</button>
-</form>
+    <h2>Welcome, {{ name }}!</h2>
 
-<h3>Your Skills</h3>
-{% if skills %}
-    <ul>
-        {% for skill, skill_type in skills %}
-            <li>{{ skill }} ({{ skill_type }})</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No skills added yet.</p>
-{% endif %}
+    <div class="section">
+        <h3>Add a Skill</h3>
+        <form method="post">
+            <input type="text" name="skill" placeholder="Enter a skill" required>
+            <select name="skill_type">
+                <option value="teach">Teach</option>
+                <option value="learn">Learn</option>
+            </select>
+            <button type="submit">Add Skill</button>
+        </form>
+    </div>
 
-{% if skills | selectattr('1', 'equalto', 'teach') | list %}
-    <p><a href="{{ url_for('create_course') }}">Create a Course</a></p>
-{% endif %}
+    <div class="section">
+        <h3>Your Skills</h3>
+        {% if skills %}
+            <ul>
+                {% for skill, skill_type in skills %}
+                    <li><strong>{{ skill }}</strong> — <span class="highlight">{{ skill_type }}</span></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-data">No skills added yet.</p>
+        {% endif %}
+    </div>
 
-<h3>Your Learning Matches</h3>
-{% if matches %}
-    <ul>
-        {% for name, they_can_teach, you_can_teach in matches %}
-            <p><strong>{{ name }}</strong></p>
-            {% if they_can_teach %}
-                <p>They can teach you: {{ they_can_teach | join(', ') }}</p>
-            {% endif %}
-            {% if you_can_teach %}
-                <p>You can teach them: {{ you_can_teach | join(', ') }}</p>
-            {% endif %}
-        <hr>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No learning matches yet. Try adding more teach/learn skills!</p>
-{% endif %}
+    {% if skills | selectattr('1', 'equalto', 'teach') | list %}
+        <div class="section">
+            <a class="button-link" href="{{ url_for('create_course') }}">+ Create a Course</a>
+        </div>
+    {% endif %}
 
-<h3>Your Enrolled Courses</h3>
-{% if enrolled_courses %}
-    <ul>
-        {% for title, start_date, instructor, payment_code in enrolled_courses %}
-            <li>
-                <strong>{{ title }}</strong><br>
-                Instructor: {{ instructor }}<br>
-                Start Date: {{ start_date or "TBA" }}<br>
-                Payment Info: {{ payment_code }}
-            </li>
-            <hr>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>You haven’t enrolled in any courses yet.</p>
-{% endif %}
+    <div class="section">
+        <h3>Your Learning Matches</h3>
+        {% if matches %}
+            {% for name, they_can_teach, you_can_teach in matches %}
+                <div style="margin-bottom: 1.5rem;">
+                    <p><strong>{{ name }}</strong></p>
+                    {% if they_can_teach %}
+                        <p>They can teach you: <span class="highlight">{{ they_can_teach | join(', ') }}</span></p>
+                    {% endif %}
+                    {% if you_can_teach %}
+                        <p>You can teach them: <span class="highlight">{{ you_can_teach | join(', ') }}</span></p>
+                    {% endif %}
+                    <hr>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">No learning matches yet. Try adding more teach/learn skills!</p>
+        {% endif %}
+    </div>
 
+    <div class="section">
+        <h3>Your Enrolled Courses</h3>
+        {% if enrolled_courses %}
+            <ul>
+                {% for title, start_date, instructor, payment_code in enrolled_courses %}
+                    <li>
+                        <strong>{{ title }}</strong><br>
+                        Instructor: {{ instructor }}<br>
+                        Starts: {{ start_date or "TBA" }}<br>
+                        Payment: {{ payment_code }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-data">You haven’t enrolled in any courses yet.</p>
+        {% endif %}
+    </div>
 
-<br>
-<a href="{{ url_for('logout') }}">Logout</a>
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+</body>
+</html>

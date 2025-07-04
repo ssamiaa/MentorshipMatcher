@@ -1,35 +1,35 @@
-{% include 'navbar.html' %}
+{% extends 'base.html' %}
 
-<h2>Browse Available Courses</h2>
+{% block title %}Browse Courses{% endblock %}
+
+{% block content %}
+<h2 style="text-align: center; margin-bottom: 2rem;">Browse Available Courses</h2>
 
 {% if courses %}
-    <ul>
-    {% for id, title, desc, is_paid, price, skill_exchange, start_date, instructor in courses %}
-        <li>
-            <strong>{{ title }}</strong> by {{ instructor }}<br>
-            {{ desc }}<br>
-            Starts on: {{ start_date or "TBA" }}<br>
-            {% if is_paid %}
-                Cost: ₹{{ price }}
-            {% else %}
-                Free
-            {% endif %}<br>
-            {% if skill_exchange %}
-                Open to Skill Exchange
-            {% endif %}<br>
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        {% for id, title, desc, is_paid, price, skill_exchange, start_date, instructor in courses %}
+            <div style="border: 1px solid #ccc; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background-color: #fff;">
+                <h3 style="margin: 0 0 0.5rem 0;">{{ title }}</h3>
+                <p style="margin: 0.2rem 0;"><strong>Instructor:</strong> {{ instructor }}</p>
+                <p style="margin: 0.2rem 0;"><strong>Description:</strong> {{ desc }}</p>
+                <p style="margin: 0.2rem 0;"><strong>Start Date:</strong> {{ start_date or "TBA" }}</p>
+                <p style="margin: 0.2rem 0;">
+                    <strong>Cost:</strong>
+                    {% if is_paid %} ₹{{ price }} {% else %} Free {% endif %}
+                </p>
+                {% if skill_exchange %}
+                    <p style="margin: 0.2rem 0;"><strong>Open to Skill Exchange</strong></p>
+                {% endif %}
 
-            {% if id in enrolled_ids %}
-                <em>You’re already enrolled</em>
-            {% else %}
-                <a href="{{ url_for('enroll', course_id=id) }}" style="margin-top: 5px; display: inline-block; padding: 6px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
-                    Enroll
-                </a>
-            {% endif %}
-
-        </li>
-        <hr>
-    {% endfor %}
-    </ul>
+                {% if id in enrolled_ids %}
+                    <p class="already-enrolled">You’re already enrolled</p>
+                {% else %}
+                    <a href="{{ url_for('enroll', course_id=id) }}" class="enroll-btn">Enroll</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
 {% else %}
-    <p>No courses available yet.</p>
+    <p style="text-align: center;">No courses available yet.</p>
 {% endif %}
+{% endblock %}
