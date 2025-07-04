@@ -59,7 +59,7 @@
 │   │   ├── browse_courses.html
 │   │   ├── enroll.html
 │   │   └── help.html
-│   ├── static/ (optional for CSS/images)
+│   ├── static/ 
 │
 ├── models.py
 ├── matcher.py
@@ -128,12 +128,3 @@
 > Samia also creates a course called “Intro to Python” that Arjun can enroll in either by paying or exchanging a skill.
 
 ---
-
-## 🧑‍💻 Developer
-
-**Samia Sajid**
-Built as a side project to explore real-world applications of Flask, web development, and interactive learning platforms.
-
----
-
-Let me know if you'd like it styled with Markdown badges or deployment instructions (e.g., for Render or Replit).
