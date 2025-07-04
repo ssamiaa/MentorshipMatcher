@@ -1,9 +1,57 @@
-<nav style="background-color: #f0f0f0; padding: 10px;">
-    <a href="{{ url_for('dashboard') }}">Dashboard</a> |
-    <a href="{{ url_for('browse_courses') }}">Browse Courses</a>
-    {% if has_teach_skill %}
-      | <a href="{{ url_for('my_courses') }}">My Courses</a>
-      | <a href="{{ url_for('create_course') }}">Create Course</a>
-    {% endif %}
-    | <a href="{{ url_for('logout') }}">Logout</a>
-  </nav>
+<style>
+    .navbar {
+        background-color: #4F46E5;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar a {
+        color: white;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .navbar a:hover {
+        color: #ddd;
+    }
+
+    .nav-left {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-right a:last-child {
+        margin-left: 1.5rem;
+        padding: 0.4rem 1rem;
+        background-color: #6366F1;
+        border-radius: 6px;
+    }
+
+    .nav-right a:last-child:hover {
+        background-color: #4338CA;
+    }
+</style>
+
+<div class="navbar">
+    <div class="nav-left">
+        Learning Hub
+    </div>
+    <div class="nav-right">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('browse_courses') }}">Browse Courses</a>
+        <a href="{{ url_for('create_course') }}">Create Course</a>
+        <a href="{{ url_for('help_page') }}">Help</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
