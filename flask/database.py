@@ -37,5 +37,32 @@ def init_db():
     );
     ''')
 
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS courses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        created_by INTEGER NOT NULL,
+        is_paid INTEGER NOT NULL CHECK (is_paid IN (0, 1)),
+        price INTEGER DEFAULT 0,
+        accepts_skill_exchange INTEGER NOT NULL CHECK (accepts_skill_exchange IN (0, 1)),
+        start_date TEXT,
+        FOREIGN KEY (created_by) REFERENCES users(id)
+    );
+    ''')
+
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS course_enrollments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        course_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        enrolled_on TEXT DEFAULT CURRENT_TIMESTAMP,
+        fake_payment_code TEXT,
+        FOREIGN KEY (course_id) REFERENCES courses(id),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    ''')
+
+
     conn.commit()
     conn.close()

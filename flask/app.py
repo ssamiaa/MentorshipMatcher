@@ -24,6 +24,82 @@ def get_user_from_session():
 def home():
     return render_template('home.html')
 
+@app.route('/browse-courses')
+def browse_courses():
+    user = get_user_from_session()
+    if not user:
+        return redirect(url_for('login'))
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''
+        SELECT courses.id, title, description, is_paid, price, accepts_skill_exchange, start_date, users.name
+        FROM courses
+        JOIN users ON courses.created_by = users.id
+    ''')
+    all_courses = c.fetchall()
+
+    # Check enrollments
+    c.execute("SELECT course_id FROM course_enrollments WHERE user_id = ?", (user.id,))
+    enrolled_ids = set(r[0] for r in c.fetchall())
+    conn.close()
+
+    return render_template('browse_courses.html', courses=all_courses, enrolled_ids=enrolled_ids)
+@app.route('/enroll/<int:course_id>', methods=['GET', 'POST'])
+def enroll(course_id):
+    user = get_user_from_session()
+    if not user:
+        return redirect(url_for('login'))
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM courses WHERE id = ?", (course_id,))
+    course = c.fetchone()
+
+    if not course:
+        conn.close()
+        flash("Course not found.")
+        return redirect(url_for('browse_courses'))
+
+    # Prevent enrolling in your own course
+    if course[3] == user.id:
+        conn.close()
+        flash("You cannot enroll in your own course.")
+        return redirect(url_for('browse_courses'))
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        billing = request.form.get('billing')
+        payment_method = request.form.get('payment_method')
+        card_number = request.form.get('card_number')
+        expiry = request.form.get('expiry')
+        cvv = request.form.get('cvv')
+        upi = request.form.get('upi')
+
+        if payment_method in ['visa', 'mastercard']:
+            fake_payment_code = f"{payment_method.upper()}:{card_number}|{expiry}|{cvv}"
+        elif payment_method in ['googlepay', 'paytm']:
+            fake_payment_code = f"{payment_method.upper()}:{upi}"
+        else:
+            fake_payment_code = "UNKNOWN"
+
+        # Insert into course_enrollments
+        try:
+            c.execute('''
+                INSERT INTO course_enrollments (course_id, user_id, fake_payment_code)
+                VALUES (?, ?, ?)
+            ''', (course_id, user.id, fake_payment_code))
+            conn.commit()
+            flash("Successfully enrolled!")
+        except sqlite3.IntegrityError:
+            flash("You're already enrolled in this course.")
+
+        conn.close()
+        return redirect(url_for('dashboard'))
+
+    conn.close()
+    return render_template('enroll.html', course=course)
+
 # Signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -92,9 +168,39 @@ def dashboard():
                 flash(f"{new_matches} new match(es) found!")
 
     skills = user.get_skills()
-    matches = user.get_matches()  # Use your User class method
+    matches = user.get_matches()  
+    enrolled_courses = user.get_enrolled_courses()
 
-    return render_template('dashboard.html', name=user.name, skills=skills, matches=matches)
+    return render_template('dashboard.html', name=user.name, skills=skills, matches=matches, enrolled_courses=enrolled_courses)
+
+# Create course page
+@app.route('/create_course', methods=['GET', 'POST'])
+def create_course():
+    user = get_user_from_session()
+    if not user:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        title = request.form['title'].strip()
+        description = request.form['description'].strip()
+        is_paid = 1 if request.form.get('is_paid') == 'yes' else 0
+        price = int(request.form.get('price', 0)) if is_paid else 0
+        skill_exchange = 1 if request.form.get('skill_exchange') == 'yes' else 0
+        start_date = request.form['start_date']
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO courses (title, description, created_by, is_paid, price, accepts_skill_exchange, start_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (title, description, user.id, is_paid, price, skill_exchange, start_date))
+        conn.commit()
+        conn.close()
+        flash("Course created successfully!")
+        return redirect(url_for('dashboard'))
+
+    return render_template('create_course.html')
+
 
 # Logout
 @app.route('/logout')

@@ -1,0 +1,45 @@
+<h2>Enroll in {{ course[1] }}</h2>
+<p>{{ course[2] }}</p>
+
+<form method="post">
+  <label>Name:</label><br>
+  <input type="text" name="name" required><br><br>
+
+  <label>Billing Address:</label><br>
+  <input type="text" name="billing" required><br><br>
+
+  <label>Payment Method:</label><br>
+  <select name="payment_method" id="payment_method" onchange="updatePaymentFields()" required>
+    <option value="">-- Select --</option>
+    <option value="visa">Visa</option>
+    <option value="mastercard">Mastercard</option>
+    <option value="googlepay">Google Pay</option>
+    <option value="paytm">Paytm</option>
+  </select><br><br>
+
+  <div id="card_fields" style="display:none;">
+    <label>Card Number:</label><br>
+    <input type="text" name="card_number"><br><br>
+
+    <label>Expiry Date:</label><br>
+    <input type="text" name="expiry" placeholder="MM/YY"><br><br>
+
+    <label>CVV:</label><br>
+    <input type="text" name="cvv"><br><br>
+  </div>
+
+  <div id="upi_fields" style="display:none;">
+    <label>UPI ID / Phone Number:</label><br>
+    <input type="text" name="upi"><br><br>
+  </div>
+
+  <button type="submit">Confirm Enrollment</button>
+</form>
+
+<script>
+function updatePaymentFields() {
+  const method = document.getElementById('payment_method').value;
+  document.getElementById('card_fields').style.display = ['visa', 'mastercard'].includes(method) ? 'block' : 'none';
+  document.getElementById('upi_fields').style.display = ['googlepay', 'paytm'].includes(method) ? 'block' : 'none';
+}
+</script>

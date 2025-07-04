@@ -1,0 +1,22 @@
+<h2>Create a Course</h2>
+<form method="POST">
+    <label>Title: <input type="text" name="title" required></label><br>
+    <label>Description: <textarea name="description" required></textarea></label><br>
+    <label>Is this course paid?
+        <select name="is_paid">
+            <option value="no">Free</option>
+            <option value="yes">Paid</option>
+        </select>
+    </label><br>
+    <label>Price (₹): <input type="number" name="price" value="0"></label><br>
+    <label>Accept skill exchange?
+        <select name="skill_exchange">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+    </label><br>
+    <label>Start Date: <input type="date" name="start_date"></label><br><br>
+    <button type="submit">Create Course</button>
+</form>
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>

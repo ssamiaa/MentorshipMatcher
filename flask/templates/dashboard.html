@@ -1,3 +1,11 @@
+{% set has_teach_skill = false %}
+{% for skill, skill_type in skills %}
+    {% if skill_type == 'teach' %}
+        {% set has_teach_skill = true %}
+    {% endif %}
+{% endfor %}
+{% include 'navbar.html' %}
+
 <h2>Welcome, {{ name }}!</h2>
 
 <h3>Add a Skill</h3>
@@ -21,6 +29,10 @@
     <p>No skills added yet.</p>
 {% endif %}
 
+{% if skills | selectattr('1', 'equalto', 'teach') | list %}
+    <p><a href="{{ url_for('create_course') }}">Create a Course</a></p>
+{% endif %}
+
 <h3>Your Learning Matches</h3>
 {% if matches %}
     <ul>
@@ -38,6 +50,24 @@
 {% else %}
     <p>No learning matches yet. Try adding more teach/learn skills!</p>
 {% endif %}
+
+<h3>Your Enrolled Courses</h3>
+{% if enrolled_courses %}
+    <ul>
+        {% for title, start_date, instructor, payment_code in enrolled_courses %}
+            <li>
+                <strong>{{ title }}</strong><br>
+                Instructor: {{ instructor }}<br>
+                Start Date: {{ start_date or "TBA" }}<br>
+                Payment Info: {{ payment_code }}
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven’t enrolled in any courses yet.</p>
+{% endif %}
+
 
 <br>
 <a href="{{ url_for('logout') }}">Logout</a>

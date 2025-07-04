@@ -1,0 +1,9 @@
+<nav style="background-color: #f0f0f0; padding: 10px;">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+    <a href="{{ url_for('browse_courses') }}">Browse Courses</a>
+    {% if has_teach_skill %}
+      | <a href="{{ url_for('my_courses') }}">My Courses</a>
+      | <a href="{{ url_for('create_course') }}">Create Course</a>
+    {% endif %}
+    | <a href="{{ url_for('logout') }}">Logout</a>
+  </nav>

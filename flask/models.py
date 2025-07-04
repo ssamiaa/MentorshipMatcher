@@ -25,3 +25,17 @@ class User:
 
     def get_matches(self):
         return view_matches_for_user(self.id)
+    
+    def get_enrolled_courses(self):
+        conn = sqlite3.connect('mentorship.db')
+        c = conn.cursor()
+        c.execute('''
+            SELECT courses.title, courses.start_date, users.name, course_enrollments.fake_payment_code
+            FROM course_enrollments
+            JOIN courses ON course_enrollments.course_id = courses.id
+            JOIN users ON courses.created_by = users.id
+            WHERE course_enrollments.user_id = ?
+        ''', (self.id,))
+        data = c.fetchall()
+        conn.close()
+        return data  # [(title, start_date, instructor, fake_payment_code), ...]
