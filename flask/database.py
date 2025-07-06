@@ -37,6 +37,7 @@ def init_db():
     );
     ''')
 
+    # Create the courses table - Stores information about courses created by users (mentors)
     c.execute('''
     CREATE TABLE IF NOT EXISTS courses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,6 +52,7 @@ def init_db():
     );
     ''')
 
+    # Create the course enrollment table - Tracks enrollments of users into courses, including payment info
     c.execute('''
     CREATE TABLE IF NOT EXISTS course_enrollments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
