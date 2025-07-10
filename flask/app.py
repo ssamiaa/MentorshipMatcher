@@ -3,6 +3,7 @@ import os
 from models import User
 from matcher import match_users_by_skills 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from database import init_db 
 import sqlite3
 
 # Initialize Flask application
@@ -241,4 +242,5 @@ def logout():
 
 # Start the Flask development server
 if __name__ == '__main__':
+    init_db() 
     app.run(debug=True)
